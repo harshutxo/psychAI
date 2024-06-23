@@ -1,12 +1,10 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f4f4f4;
+    background-color: #f8f9fa;
 }
 
 h1, h2 {
-    color: #333;
+    color: #343a40;
 }
 
 ul {
@@ -15,25 +13,11 @@ ul {
 }
 
 li {
-    background: #fff;
     margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
 }
 
 #chat-box {
     margin-top: 20px;
-    background: #fff;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-#messages {
-    max-height: 300px;
-    overflow-y: auto;
-    margin-bottom: 10px;
 }
 
 #messages p {
@@ -42,25 +26,4 @@ li {
 
 form {
     display: flex;
-}
-
-input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-right: 10px;
-}
-
-button {
-    padding: 10px 20px;
-    background: #007BFF;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-button:hover {
-    background: #0056b3;
 }

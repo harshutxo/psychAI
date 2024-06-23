@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
 import random
+from chatbot_responses import get_response_from_chatbot
 
 app = Flask(__name__)
 
@@ -30,15 +31,6 @@ cbt_exercises = [
         ]
     }
 ]
-
-def get_response_from_chatbot(user_input):
-    # Placeholder AI chatbot response logic
-    responses = [
-        "That sounds tough. Have you tried any relaxation techniques?",
-        "I'm here to help. Can you tell me more about what's on your mind?",
-        "Let's work through this together. What's the first step you can take?"
-    ]
-    return random.choice(responses)
 
 @app.route('/')
 def index():
