@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CBT Therapy WebApp</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>Welcome to CBT Therapy</h1>
+    <h2>CBT Exercises</h2>
+    <ul>
+        {% for exercise in exercises %}
+            <li>
+                <h3>{{ exercise.title }}</h3>
+                <p>{{ exercise.description }}</p>
+                <ol>
+                    {% for step in exercise.steps %}
+                        <li>{{ step }}</li>
+                    {% endfor %}
+                </ol>
+            </li>
+        {% endfor %}
+    </ul>
+    <h2>Chat with the AI</h2>
+    <div id="chat-box">
+        <div id="messages"></div>
+        <form id="chat-form">
+            <input type="text" id="message" placeholder="Type your message here...">
+            <button type="submit">Send</button>
+        </form>
+    </div>
+    <script>
+        document.getElementById('chat-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const message = document.getElementById('message').value;
+            fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `message=${message}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const messagesDiv = document.getElementById('messages');
+                messagesDiv.innerHTML += `<p><strong>You:</strong> ${message} <br><strong>AI:</strong> ${data.response} <span>${data.timestamp}</span></p>`;
+                document.getElementById('message').value = '';
+            });
+        });
+    </script>
+</body>
+</html>
