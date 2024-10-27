@@ -2,7 +2,9 @@ import os
 import logging
 from flask import Flask, render_template, request, jsonify
 from datetime import datetime
-from chatbot_responses import get_response_from_openai
+from model import TextGenerator
+from nlu import NLU
+from dialogue_manager import DialogueManager
 
 # Example CBT content and responses
 cbt_exercises = [
@@ -27,6 +29,9 @@ cbt_exercises = [
 ]
 
 app = Flask(__name__)
+text_gen = TextGenerator()
+nlu = NLU()
+dm = DialogueManager()
 
 # Configure logging
 logging.basicConfig(level=logging.WARNING)
@@ -34,21 +39,30 @@ logger = logging.getLogger(__name__)
 
 @app.route('/')
 def index():
-    return render_template('index.html', exercises=cbt_exercises)
+    return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
     try:
         user_input = request.form['message']
-        logger.info(f"User input: {user_input}")
         
-        response = get_response_from_openai(user_input)
-        logger.info(f"Bot response: {response}")
+        # NLU processing
+        sentiment, _ = nlu.analyze_sentiment(user_input)
+        keywords = nlu.extract_keywords(user_input)
         
-        return jsonify({'response': response, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S")})
+        # Update dialogue context
+        dm.update_context(user_input, sentiment, keywords)
+        
+        # Determine next action
+        next_action = dm.determine_next_action()
+        
+        # Generate response
+        response = text_gen.generate_text(f"{next_action}: {user_input}", max_length=100)
+        
+        return jsonify({'message': user_input, 'response': response})
     except Exception as e:
         logger.error(f"Error processing chat: {e}")
-        return jsonify({'response': 'Sorry, there was an error processing your request.'}), 500
+        return jsonify({'message': user_input, 'response': "Sorry, something went wrong."})
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True, use_reloader=False)

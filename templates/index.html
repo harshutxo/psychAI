@@ -3,36 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PsychAI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <title>PsychAI Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 80%;
+            max-width: 600px;
+            margin: auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .chatbox {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .message {
+            padding: 5px 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            max-width: 80%;
+        }
+        .user {
+            background-color: #d1e7dd;
+            margin-left: auto;
+        }
+        .bot {
+            background-color: #f8d7da;
+        }
+        #message {
+            width: 70%;
+            padding: 5px;
+        }
+        button {
+            padding: 5px 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Welcome to PsychAI</h1>
-        <div class="card-container">
-            {% for exercise in exercises %}
-            <div class="card">
-                <div class="card-image">
-                    <img src="{{ url_for('static', filename=exercise.image) }}" alt="{{ exercise.title }}">
-                </div>
-                <div class="card-content">
-                    <h2>{{ exercise.title }}</h2>
-                    <p>{{ exercise.description }}</p>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <div class="chat-container">
-            <form id="chat-form">
-                <input type="text" name="message" id="message" placeholder="Type your message here...">
-                <button type="submit">Send</button>
-            </form>
-            <div id="chatbox"></div>
-        </div>
+        <div class="chatbox" id="chatbox"></div>
+        <input type="text" id="message" placeholder="Type your message here...">
+        <button onclick="sendMessage()">Send</button>
     </div>
+    <script>
+        function sendMessage() {
+            var message = document.getElementById('message').value;
+            if (message.trim() === '') return;
+            var chatbox = document.getElementById('chatbox');
+            var userMessage = '<div class="message user">' + message + '</div>';
+            chatbox.innerHTML += userMessage;
+            fetch('/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'message=' + encodeURIComponent(message),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var botMessage = '<div class="message bot">' + data.response + '</div>';
+                chatbox.innerHTML += botMessage;
+                document.getElementById('message').value = '';
+                chatbox.scrollTop = chatbox.scrollHeight;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                var errorMessage = '<div class="message bot">Sorry, something went wrong.</div>';
+                chatbox.innerHTML += errorMessage;
+            });
+        }
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+        // Add event listener for Enter key
+        document.getElementById('message').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
 </body>
 </html>
